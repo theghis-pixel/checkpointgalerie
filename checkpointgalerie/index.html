@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Galerie Produits</title>
+
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #111;
+      --card: #f3f3f3;
+      --accent: #4f46e5;
+    }
+
+    body.dark {
+      --bg: #111;
+      --text: #fff;
+      --card: #1f1f1f;
+      --accent: #8b5cf6;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: 0.3s ease;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button, select {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* GALLERY */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.6s forwards;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .card img:hover {
+      transform: scale(1.1);
+    }
+
+    .card-content {
+      padding: 15px;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* LIGHTBOX */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .lightbox img {
+      max-width: 80%;
+      max-height: 80%;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Galerie Produits</h1>
+
+  <div class="controls">
+    <select id="filter">
+      <option value="all">Tous</option>
+      <option value="tech">Tech</option>
+      <option value="mode">Mode</option>
+      <option value="maison">Maison</option>
+    </select>
+
+    <button id="themeToggle">Mode sombre</button>
+  </div>
+</header>
+
+<section class="gallery">
+
+  <div class="card" data-category="tech">
+    <img src="https://picsum.photos/400/300?1" />
+    <div class="card-content">
+      <h3>Casque Audio</h3>
+      <p>Qualité sonore premium</p>
+    </div>
+  </div>
+
+  <div class="card" data-category="mode">
+    <img src="https://picsum.photos/400/300?2" />
+    <div class="card-content">
+      <h3>Montre</h3>
+      <p>Style élégant</p>
+    </div>
+  </div>
+
+  <div class="card" data-category="maison">
+    <img src="https://picsum.photos/400/300?3" />
+    <div class="card-content">
+      <h3>Lampe</h3>
+      <p>Ambiance chaleureuse</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <img id="lightboxImg" />
+</div>
+
+<script>
+  const themeBtn = document.getElementById("themeToggle");
+  const filter = document.getElementById("filter");
+  const cards = document.querySelectorAll(".card");
+  const lightbox = document.getElementById("lightbox");
+  const lightboxImg = document.getElementById("lightboxImg");
+
+  /* ---------------- THEME ---------------- */
+  function setTheme(isDark) {
+    document.body.classList.toggle("dark", isDark);
+    localStorage.setItem("theme", isDark ? "dark" : "light");
+    themeBtn.textContent = isDark ? "Mode clair" : "Mode sombre";
+  }
+
+  themeBtn.addEventListener("click", () => {
+    setTheme(!document.body.classList.contains("dark"));
+  });
+
+  (function initTheme() {
+    const saved = localStorage.getItem("theme");
+    setTheme(saved === "dark");
+  })();
+
+  /* ---------------- FILTER ---------------- */
+  filter.addEventListener("change", () => {
+    const value = filter.value;
+
+    cards.forEach(card => {
+      const show = value === "all" || card.dataset.category === value;
+      card.style.display = show ? "block" : "none";
+    });
+  });
+
+  /* ---------------- LIGHTBOX ---------------- */
+  cards.forEach(card => {
+    const img = card.querySelector("img");
+
+    img.addEventListener("click", () => {
+      lightbox.style.display = "flex";
+      lightboxImg.src = img.src;
+    });
+  });
+
+  lightbox.addEventListener("click", () => {
+    lightbox.style.display = "none";
+  });
+</script>
+
+</body>
+</html>
